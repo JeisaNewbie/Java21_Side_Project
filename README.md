@@ -31,3 +31,34 @@
 - [ ] 6. 집계 계산 (카테고리별 합계, 총 수입/지출, 잔액)
 - [ ] 7. CSV 파일로 저장 및 불러오기 (`try-with-resources`)
 - [ ] 8. 월간 리포트 출력 (텍스트 블록)
+
+## 리팩터링 백로그 (우선순위 낮음, 학습용)
+필수 기능(1~8) 다 끝내고 여유 있을 때, 학습 목적으로 진행할 항목.
+
+- [ ] 9. `TransactionRepository`의 `findByDate` / `findByCategory` / `findByType`을 `Predicate<Transaction>` 기반 공통 메서드로 통합
+  - **왜 Predicate를 쓰는가**: 세 메서드 모두 "리스트를 순회하면서 조건 하나 체크해서 새 리스트에 담기"라는 동일한 구조를 반복하고 있음(코드 중복). 셋의 차이는 오직 "무엇으로 비교하냐"(조건)뿐이고 "어떻게 순회/수집하냐"(로직)는 완전히 같음. `Predicate<T>`는 "T를 받아 `boolean`을 리턴하는 함수"를 변수처럼 전달할 수 있게 해주는 함수형 인터페이스라, "순회/수집 로직은 재사용하고 조건만 갈아끼우고 싶다"는 지금 상황에 정확히 맞는 도구임.
+  - 필터 종류가 늘어날수록(예: 금액 범위, 메모 검색 등) 이 패턴의 이점이 커짐 — 새 필터를 추가할 때마다 반복문을 또 짤 필요 없이 조건(람다)만 추가하면 됨.
+  - 참고 형태:
+    ```java
+    private List<Transaction> findBy(Predicate<Transaction> condition) {
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction t : transactions) {
+            if (condition.test(t)) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    public List<Transaction> findByDate(LocalDate date) {
+        return findBy(t -> t.date().equals(date));
+    }
+
+    public List<Transaction> findByCategory(Category category) {
+        return findBy(t -> t.category() == category);
+    }
+
+    public List<Transaction> findByType(TransactionType type) {
+        return findBy(t -> t.type() == type);
+    }
+    ```
