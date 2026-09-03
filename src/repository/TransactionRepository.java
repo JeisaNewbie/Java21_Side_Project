@@ -46,6 +46,30 @@ public class TransactionRepository {
 		return result;
 	}
 	
+	public List<Transaction> findByCategory(Category category) {
+		List<Transaction> result = new ArrayList<>();
+		
+		for (Transaction transaction : this.transactions) {
+			if (transaction.category() == category) {
+				result.add(transaction);
+			}
+		}
+		
+		return result;
+	}
+	
+	public List<Transaction> findByType(TransactionType type) {
+		List<Transaction> result = new ArrayList<>();
+		
+		for (Transaction transaction : this.transactions) {
+			if (transaction.type() == type) {
+				result.add(transaction);
+			}
+		}
+		
+		return result;
+	}
+	
 	public void update(int id, LocalDate date, TransactionType type, Category category, long amount, String memo) {
 		int index = -1;
 		
