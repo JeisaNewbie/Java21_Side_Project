@@ -3,6 +3,7 @@ import domain.IncomeCategory;
 import domain.Transaction;
 import domain.TransactionType;
 import repository.TransactionRepository;
+import service.ReportService;
 import service.StatisticService;
 
 import java.time.LocalDate;
@@ -51,6 +52,19 @@ public class Main {
 		System.out.println("[9월만]   실제 - 총수입: " + statisticsService.totalIncome(septemberOnly)
 				+ " / 총지출: " + statisticsService.totalExpense(septemberOnly)
 				+ " / 잔액: " + statisticsService.balance(septemberOnly));
+
+		System.out.println();
+		System.out.println("===== 월간 리포트 (2026년 9월) =====");
+		ReportService reportService = new ReportService();
+		YearMonth targetMonth = YearMonth.of(2026, 9);
+		String monthlyReport = reportService.generateMonthlyReport(
+				targetMonth,
+				statisticsService.totalIncome(septemberOnly),
+				statisticsService.totalExpense(septemberOnly),
+				statisticsService.balance(septemberOnly),
+				statisticsService.totalByCategory(septemberOnly)
+		);
+		System.out.println(monthlyReport);
 	}
 
 	// 계산하기 쉬운 라운드 넘버로 구성 — 결과를 눈으로 바로 검증하기 위함
