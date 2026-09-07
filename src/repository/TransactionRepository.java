@@ -1,13 +1,13 @@
 package repository;
 
-import domain.Category;
-import domain.Transaction;
-import domain.TransactionType;
+import domain.*;
 import exception.TransactionNotFoundException;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TransactionRepository {
 	private final List<Transaction> transactions = new ArrayList<>();
@@ -39,6 +39,18 @@ public class TransactionRepository {
 		
 		for (Transaction transaction : this.transactions) {
 			if (transaction.date().equals(date)) {
+				result.add(transaction);
+			}
+		}
+		
+		return result;
+	}
+	
+	public List<Transaction> findByMonth(YearMonth yearMonth) {
+		List<Transaction> result = new ArrayList<>();
+		
+		for (Transaction transaction : this.transactions) {
+			if (YearMonth.from(transaction.date()).equals(yearMonth)) {
 				result.add(transaction);
 			}
 		}
